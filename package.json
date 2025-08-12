@@ -1,0 +1,90 @@
+{
+  "name": "embed-frames-example",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.2.5",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "react-redux": "^7.2.0",
+    "react-scripts": "5.0.1",
+    "ryuu.js": "^4.2.0",
+    "typescript": "^4.0.3"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "start:pagefilters": "da with-filters",
+    "lint": "eslint 'src/**/*.ts?(x)'",
+    "upload": "yarn build && cd build && domo publish && cd ..",
+    "upload:prod": "yarn build:prod && cd build && domo publish && cd ..",
+    "storybook": "start-storybook -p 6006 -s public",
+    "generate": "da generate",
+    "prestart": "da apply-manifest start",
+    "postbuild": "da apply-manifest build && da build-replacements",
+    "build:prod": "GENERATE_SOURCEMAP=false react-scripts build",
+    "postbuild:prod": "da apply-manifest build && da build-replacements",
+    "build:ci:dev": "GENERATE_SOURCEMAP=false react-scripts build && da apply-manifest build dev && da build-replacements",
+    "build:ci:qa": "GENERATE_SOURCEMAP=false react-scripts build && da apply-manifest build qa && da build-replacements",
+    "deploy:ci:dev": "yarn build:ci:dev && cd build && domo publish && cd ..",
+    "deploy:ci:qa": "yarn build:ci:qa && cd build && domo publish && cd ..",
+    "test:ci": "yarn test -- --watchAll=false --ci --runInBand --forceExit"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.0",
+    "@domoinc/da": "^1.3.5",
+    "@domoinc/eslint-config": "^2.0.0",
+    "@domoinc/prettier-config": "^1.2.0",
+    "@domoinc/ryuu-proxy": "^4.0.6",
+    "@storybook/addon-actions": "^6.5.13",
+    "@storybook/addon-essentials": "^6.5.13",
+    "@storybook/addon-links": "^6.5.13",
+    "@storybook/builder-webpack5": "^6.5.13",
+    "@storybook/manager-webpack5": "^6.5.13",
+    "@storybook/node-logger": "^6.5.13",
+    "@storybook/preset-create-react-app": "^4.0.0",
+    "@storybook/react": "^6.5.13",
+    "@testing-library/react": "^13.3.0",
+    "@types/jest": "^24.0.0",
+    "@types/node": "^12.0.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@types/react-redux": "^7.1.7",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "babel-loader": "^8.2.3",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-react": "^7.14.3",
+    "prettier": "^3.0.0",
+    "react-is": "^16.13.1",
+    "sass": "^1.61.0"
+  },
+  "resolutions": {
+    "glob-parent": "^5.1.2",
+    "nth-check": "^2.0.1",
+    "postcss": "^8.4.31",
+    "trim": "^0.0.3",
+    "trim-newlines": "^3.0.1",
+    "cookie": "^0.7.0",
+    "http-proxy-middleware": "^2.0.7",
+    "@types/react": "^18.3.0"
+  }
+}

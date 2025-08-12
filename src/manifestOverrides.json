@@ -1,0 +1,8 @@
+{
+  "dev": {
+    "manifest": {}
+  },
+  "qa": {
+    "manifest": {}
+  }
+}
