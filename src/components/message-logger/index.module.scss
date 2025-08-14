@@ -1,0 +1,189 @@
+.messageLogger {
+  margin: 2rem 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  overflow: hidden;
+}
+
+.loggerHeader {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.loggerHeader h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.loggerControls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.messageCount {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.clearButton {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+}
+
+.clearButton:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.clearButton:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.logContainer {
+  max-height: 400px;
+  overflow-y: auto;
+  background: #fafafa;
+}
+
+.emptyState {
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+.logEntry {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 1rem;
+  background: white;
+  border-left: 4px solid transparent;
+}
+
+.logEntry:last-child {
+  border-bottom: none;
+}
+
+.logEntry.sent {
+  border-left-color: #007bff;
+  background: #f8f9ff;
+}
+
+.logEntry.received {
+  border-left-color: #28a745;
+  background: #f8fff8;
+}
+
+.logEntry.system {
+  border-left-color: #ffc107;
+  background: #fffef8;
+}
+
+.logHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.messageType {
+  font-weight: 600;
+  font-family: monospace;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  background: #e9ecef;
+  color: #495057;
+}
+
+.timestamp {
+  font-size: 0.75rem;
+  color: #666;
+  font-family: monospace;
+}
+
+.logData {
+  margin-top: 0.5rem;
+}
+
+.logData pre {
+  background: #f1f3f4;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin: 0;
+  font-size: 0.875rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.loggerFooter {
+  background: #f8f9fa;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.legend {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.indicator.sent {
+  background: #007bff;
+}
+
+.indicator.received {
+  background: #28a745;
+}
+
+.indicator.system {
+  background: #ffc107;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .loggerHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .loggerControls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .legend {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .logContainer {
+    max-height: 300px;
+  }
+}

@@ -1,6 +1,9 @@
 {
   "dev": {
-    "manifest": {}
+    "manifest": {
+      "id": "33f75d07-c380-4417-aa34-c7d9ba3e3424",
+      "proxyId": "000b1e97-079b-45f2-94d8-3b3ea28b07d4"
+    }
   },
   "qa": {
     "manifest": {}

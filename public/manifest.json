@@ -5,5 +5,11 @@
     "width": 3,
     "height": 3
   },
-  "mapping": []
+  "mapping": [
+    {
+      "dataSetId": "ca625e70-882b-42cc-8157-3aa63505e074",
+      "alias": "living_legend",
+      "fields": []
+    }
+  ]
 }

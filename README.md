@@ -1,23 +1,244 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app) using the command: `yarn create react-app my-app --template git+ssh://git@github.com/DomoApps/advanced.git`
+# Domo Embed Frames Example
 
-# DomoApps Advanced App Platform Package
+This project demonstrates how to create a custom application that embeds Domo cards and utilizes postMessage communication between your custom frames and Domo's embedded analytics.
 
-Create React App Template optimized for advanced DomoApp usage.
-- The manifest and thumbnail are provided in the `public` folder.
-- The proxy server is setup with `@domoinc/ryuu-proxy` for local development to your domo instance.
-- An upload script has been added to the package.json for easy upload.
+## 🎯 Purpose
 
-Steps to get going:
-1) Use the domoapps cli to login to your Domo instance `domo login`
-2) Upload your base app to your Domo instance using `yarn upload` or `yarn upload`
-3) The project will build, add all assets to the `build` folder, and then upload the assets to Domo
-4) The `manifest.json` file in the `build` folder will be modified by the domoapps cli to include an `id` property. You will want to copy this `id` into the manifest in your `public` folder so that it doesn't continue to create a new `id` on each upload
-5) If you intend to use AppDB, make sure to also add a `proxyId` to the `manifest.json` file in your `public` folder. See [documentation](https://developer.domo.com/docs/dev-studio/step4#Set%20Up%20Your%20Proxy) for more info.
-6) Generate new `components` and `reducers` using the `yarn generate` command (more info below).
+This instructional example teaches developers how to:
+- Embed Domo cards in custom applications
+- Implement bidirectional communication using postMessage API
+- Handle different types of messages and events
+- Create a robust communication framework for embedded analytics
 
-## basic cra-template information
+## 🚀 Features
 
-- [Getting Started](https://create-react-app.dev/docs/getting-started) – How to create a new app.
+### 1. **Embedded Card Component**
+- Configurable card embedding with custom dimensions
+- Automatic iframe setup with security considerations
+- Real-time card configuration updates
+
+### 2. **PostMessage Communication**
+- Send messages to embedded cards (filters, refresh commands, custom events)
+- Receive messages from embedded cards (user interactions, data updates)
+- Real-time message logging and debugging
+
+### 3. **Interactive Controls**
+- Apply filters to embedded cards
+- Trigger data refreshes
+- Export data functionality
+- Send custom events and commands
+
+### 4. **Message Logger**
+- Real-time logging of all postMessage communications
+- Message type categorization (sent/received/system)
+- Timestamped message history
+- JSON data formatting and display
+
+## 🛠 Setup Instructions
+
+### Prerequisites
+- Node.js (v14 or higher)
+- Yarn package manager
+- Domo Developer Account
+- Access to Domo instance with embedding enabled
+
+### Installation
+
+1. **Clone and install dependencies:**
+   ```bash
+   git clone <repository-url>
+   cd embed-frames-example
+   yarn install
+   ```
+
+2. **Configure Domo CLI:**
+   ```bash
+   domo login
+   ```
+
+3. **Update configuration:**
+   - Edit `src/components/embedded-card/index.tsx`
+   - Replace `your-domo-instance` with your actual Domo instance name
+   - Update the `domoInstance` prop in the EmbeddedCard component
+
+4. **Run the development server:**
+   ```bash
+   yarn start
+   ```
+
+5. **Upload to Domo (optional):**
+   ```bash
+   yarn upload
+   ```
+
+## 📖 Usage Guide
+
+### Basic Usage
+
+1. **Enter a Card ID**: Input a valid Domo card ID in the configuration section
+2. **Configure the card**: Set title and display options
+3. **View the embedded card**: The card will load in an iframe
+4. **Test communication**: Use the control buttons to send messages
+
+### PostMessage API Examples
+
+#### Sending Messages to Cards
+```javascript
+// Filter application
+iframe.contentWindow.postMessage({
+  type: 'FILTER_CHANGE',
+  data: { filters: { region: 'North America' } }
+}, '*');
+
+// Data refresh
+iframe.contentWindow.postMessage({
+  type: 'REFRESH_DATA'
+}, '*');
+
+// Custom events
+iframe.contentWindow.postMessage({
+  type: 'CUSTOM_EVENT',
+  data: { action: 'highlight', value: 'top-performers' }
+}, '*');
+```
+
+#### Receiving Messages from Cards
+```javascript
+window.addEventListener('message', (event) => {
+  // Validate origin for security
+  if (event.origin !== 'https://your-domo-instance.domo.com') return;
+  
+  switch (event.data.type) {
+    case 'CARD_CLICKED':
+      console.log('User clicked on card:', event.data);
+      break;
+    case 'DATA_UPDATED':
+      console.log('Card data updated:', event.data);
+      break;
+    case 'FILTER_APPLIED':
+      console.log('Filter was applied:', event.data);
+      break;
+  }
+});
+```
+
+## 🏗 Architecture
+
+### Component Structure
+```
+src/
+├── components/
+│   ├── app/                    # Main application component
+│   ├── embedded-card/          # Card embedding component
+│   ├── message-logger/         # PostMessage logging component
+│   └── counter/               # Example counter (can be removed)
+├── reducers/                  # Redux state management
+└── styles/                    # Global styles
+```
+
+### Key Components
+
+#### `EmbeddedCard`
+- Manages iframe lifecycle
+- Handles card initialization
+- Provides security sandbox settings
+- Sends initial configuration messages
+
+#### `MessageLogger`
+- Logs all postMessage communications
+- Provides real-time debugging capabilities
+- Formats and displays message data
+- Maintains message history
+
+#### `App`
+- Main application orchestrator
+- Manages global message listeners
+- Provides UI for card configuration
+- Demonstrates various communication patterns
+
+## 🔒 Security Considerations
+
+### Origin Validation
+```javascript
+// Always validate message origins in production
+if (event.origin !== 'https://your-domo-instance.domo.com') return;
+```
+
+### Iframe Sandbox
+```html
+<iframe
+  sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+  src={embedUrl}
+/>
+```
+
+### Content Security Policy
+Configure CSP headers to allow embedding from trusted Domo domains.
+
+## 📋 Message Types Reference
+
+### Standard Messages (sent to cards)
+- `FILTER_CHANGE`: Apply filters to card data
+- `REFRESH_DATA`: Trigger data refresh
+- `EXPORT_DATA`: Request data export
+- `CARD_INIT`: Initial card configuration
+- `CUSTOM_EVENT`: Custom application events
+
+### Standard Messages (received from cards)
+- `CARD_LOADED`: Card finished loading
+- `CARD_CLICKED`: User interaction with card
+- `DATA_UPDATED`: Data source updated
+- `FILTER_APPLIED`: Filter successfully applied
+- `ERROR`: Error occurred in card
+
+## 🔧 Customization
+
+### Adding New Message Types
+1. Update the message type constants
+2. Add handlers in the main App component
+3. Update the embedded card component if needed
+4. Add corresponding UI controls
+
+### Styling Customization
+- Modify SCSS files in each component directory
+- Update global styles in `src/styles/`
+- Customize color scheme in `src/styles/variables.scss`
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **Card not loading**
+   - Verify card ID is correct
+   - Check Domo instance URL
+   - Ensure embedding is enabled for the card
+
+2. **Messages not being received**
+   - Verify origin validation settings
+   - Check browser console for errors
+   - Ensure postMessage syntax is correct
+
+3. **CORS errors**
+   - Configure proper CORS headers on Domo instance
+   - Verify iframe sandbox permissions
+
+## 📚 Additional Resources
+
+- [Domo Embedding Documentation](https://developer.domo.com/docs/embedding/embedded-analytics)
+- [PostMessage API Documentation](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage)
+- [Advanced App Platform Guide](https://developer.domo.com/docs/dev-studio/advanced-app-platform)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 - [User Guide](https://create-react-app.dev) – How to develop apps bootstrapped with Create React App.
 
 ## Available Scripts

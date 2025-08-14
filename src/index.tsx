@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import RyuuJS from 'ryuu.js';
 
-import { store } from './reducers';
+import store from './redux/store';
 import App from 'components/app';
 
 import './styles/index.scss';

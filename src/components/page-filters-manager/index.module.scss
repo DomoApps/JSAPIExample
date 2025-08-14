@@ -1,0 +1,283 @@
+.pageFiltersManager {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.statusIndicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.statusIndicator.ready {
+  background: #28a745;
+}
+
+.statusIndicator.notReady {
+  background: #ffc107;
+}
+
+.statusText {
+  font-size: 0.875rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Quick Filters Section */
+.quickFilters {
+  margin-bottom: 2rem;
+}
+
+.quickFilters h3 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.125rem;
+}
+
+.filterButtons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.quickFilterButton {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+}
+
+.quickFilterButton:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.quickFilterButton:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.clearButton {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+}
+
+.clearButton:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.clearButton:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Active Filters Section */
+.activeFilters {
+  margin-bottom: 2rem;
+}
+
+.activeFilters h3 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.125rem;
+}
+
+.noFilters {
+  color: #666;
+  font-style: italic;
+  margin: 0;
+}
+
+.filterList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filterItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border-left: 4px solid #007bff;
+}
+
+.filterInfo {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex: 1;
+}
+
+.filterColumn {
+  font-weight: 600;
+  color: #333;
+  font-family: monospace;
+  background: #e9ecef;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.875rem;
+}
+
+.filterOperator {
+  color: #666;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+}
+
+.filterValues {
+  color: #333;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.removeButton {
+  background: #dc3545;
+  color: white;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.removeButton:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.removeButton:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Custom Filter Section */
+.customFilter h3 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.125rem;
+}
+
+.filterForm {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: end;
+}
+
+.input,
+.select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  min-width: 120px;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.addButton {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  transition: background-color 0.2s;
+}
+
+.addButton:hover:not(:disabled) {
+  background: #1e7e34;
+}
+
+.addButton:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .filterButtons {
+    flex-direction: column;
+  }
+
+  .quickFilterButton,
+  .clearButton {
+    width: 100%;
+  }
+
+  .filterForm {
+    flex-direction: column;
+  }
+
+  .input,
+  .select,
+  .addButton {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .filterItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .filterInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+}

@@ -1388,6 +1388,11 @@
   resolved "https://registry.yarnpkg.com/@domoinc/prettier-config/-/prettier-config-1.2.0.tgz#0bca56346d0d79f38ae816bf8f71639590178eb9"
   integrity sha512-kIi6HlICUvQZnsZV5VYlx3XvZt6snSbUCNjThKMrb5ZXq1Z+3O79Ek0KhVkKUC9paHRTiNSoS6iFe3DrIjs4MQ==
 
+"@domoinc/query@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@domoinc/query/-/query-3.0.0.tgz#935c09a93dbaf1a341e69f60a5e143225f31f713"
+  integrity sha512-JXKJbDYBHAZfdb7VEkq1U5GMyrO2NK+1+WpQR1qw3ynbmT7YKbgrAoEmGDnEa4LkI02hi5dc7fEWGng3yJSypA==
+
 "@domoinc/ryuu-proxy@^4.0.6", "@domoinc/ryuu-proxy@^4.3.4":
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/@domoinc/ryuu-proxy/-/ryuu-proxy-4.4.0.tgz#bd2cb69cae48ce7bbee8174f38741ca59085dfc3"

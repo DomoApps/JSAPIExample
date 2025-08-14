@@ -1,1 +1,1 @@
-module.exports = require('@domoapps/prettier-config');
+module.exports = require('@domoinc/prettier-config');
