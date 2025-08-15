@@ -6,33 +6,16 @@ import {
   PageFilterDataType,
   PageFilterOperator,
 } from 'models';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'redux/store';
-
-const channels: Record<
-  string,
-  {
-    referenceId: string;
-    messagePort: MessagePort;
-  }
-> = {};
-
-const applyFiltersToFrames = (filters: PageFilter[]) => {
-  Object.values(channels).forEach((channel) => {
-    channel.messagePort.postMessage({
-      id: 'setFilters',
-      jsonrpc: '2.0',
-      method: '/v1/filters/apply',
-      params: { filters },
-    });
-  });
-};
+import { setFilters } from 'redux/pageFiltersSlice';
 
 interface Props {
   notifyChanges: (filters: PageFilter[]) => void;
 }
 
 export const PageFiltersManager: React.FC<Props> = (props: Props) => {
+  const dispatch = useDispatch();
   const selectedClass = useSelector(
     (state: RootState) => state.dropdownOptions.currentSelected,
   );
@@ -52,18 +35,21 @@ export const PageFiltersManager: React.FC<Props> = (props: Props) => {
         'Light Illusionist',
       ],
     };
-    props.notifyChanges([newFilter]);
+    dispatch(setFilters({ filters: [newFilter] }));
   };
   useEffect(() => {
+    if (selectedClass === null) {
+      return;
+    }
     const newFilter: PageFilter = {
       column: 'Talent_Class',
       columnType: ColumnType.STRING,
       dataType: PageFilterDataType.String,
       label: 'Talent Class',
       operand: PageFilterOperator.In,
-      values: [selectedClass === null ? '' : selectedClass],
+      values: [selectedClass],
     };
-    props.notifyChanges([newFilter]);
+    dispatch(setFilters({ filters: [newFilter] }));
   }, [selectedClass]);
 
   return (

@@ -8,6 +8,7 @@ import {
 } from 'models';
 import { useStateRef } from 'hooks/use-state-ref';
 import { filtersAreEquals, hasAppStudioTag } from 'utils/functions';
+import { MessageType } from 'constants/index';
 
 /**
  * Represents a channel with an ID and a message port.
@@ -46,7 +47,7 @@ export const usePageFilters = (
   const recordMessage = useCallback(
     (
       source: string,
-      params: Record<string, string>,
+      params: Record<string, string | PageFilter[]>,
       type: string,
       timestamp: number,
     ) => {
@@ -77,9 +78,14 @@ export const usePageFilters = (
   );
 
   useEffect(() => {
+    recordMessage(
+      '/v1/filters/apply',
+      { filters: currentFilters },
+      MessageType.SENT,
+      Date.now(),
+    );
     Object.values(channels).forEach((channel) => {
       const filters = currentFilters.filter((v) => v.source !== channel.id);
-      console.log(`Sending filters to channel ${channel.id}:`, filters);
       channel.messagePort.postMessage({
         id: 'setFilters',
         jsonrpc: '2.0',
@@ -101,7 +107,7 @@ export const usePageFilters = (
         switch (portEvent.data.method) {
           case '/v1/onFrameSizeChange':
             recordMessage(
-              '/v1/onFrameSizeChange',
+              MessageType.RECEIVED,
               portEvent.data?.params,
               portEvent.data?.method,
               Date.now(),
@@ -109,7 +115,7 @@ export const usePageFilters = (
             break;
           case '/v1/onAppReady':
             recordMessage(
-              '/v1/onAppReady',
+              MessageType.RECEIVED,
               portEvent.data?.params,
               portEvent.data?.method,
               Date.now(),
@@ -118,9 +124,9 @@ export const usePageFilters = (
             break;
           case '/v1/onFiltersChange':
             recordMessage(
-              '/v1/onFiltersChange',
-              portEvent.data?.params,
               portEvent.data?.method,
+              portEvent.data?.params,
+              MessageType.RECEIVED,
               Date.now(),
             );
             if (hasAppStudioTag(referenceId) === false) {
@@ -209,9 +215,9 @@ export const usePageFilters = (
             break;
           case '/v1/onDrill':
             recordMessage(
-              '/v1/onDrill',
-              portEvent.data?.params,
               portEvent.data?.method,
+              portEvent.data?.params,
+              MessageType.RECEIVED,
               Date.now(),
             );
             if (hasAppStudioTag(referenceId) === true) {
@@ -271,7 +277,6 @@ export const usePageFilters = (
   }, []);
 
   const notify = useCallback((value: PageFilter[]) => {
-    console.log('Setting filters:', value);
     setCurrentFilters(value);
   }, []);
 
