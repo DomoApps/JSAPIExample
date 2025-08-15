@@ -62,288 +62,60 @@ const currentFilters = await window.domo.getFilters();
 await window.domo.setFilters(newFilters);
 ```
 
-## Message Types for Page Filters
+## Updated Hook: `usePageFilters`
 
-### Outbound Messages (Host → Card)
+The `usePageFilters` hook centralizes the logic for managing page filters and communicating with embedded cards. It provides:
 
-#### PAGE_FILTERS_UPDATED
+1. **Filter Change Notifications**: Notifies the app and embedded cards of filter changes.
+2. **Message Logging**: Logs messages sent and received via postMessage.
+3. **Channel Registration**: Manages communication channels with embedded cards.
 
-Sent when page filters change in the Domo environment.
-
-```javascript
-{
-  type: 'PAGE_FILTERS_UPDATED',
-  data: {
-    filters: [
-      {
-        column: 'Region',
-        operator: 'EQUALS',
-        values: ['North America']
-      }
-    ]
-  }
-}
-```
-
-#### SYNC_PAGE_FILTERS
-
-Synchronizes current page filter state with embedded cards.
-
-```javascript
-{
-  type: 'SYNC_PAGE_FILTERS',
-  data: {
-    filters: [...currentPageFilters]
-  }
-}
-```
-
-#### REQUEST_FILTER_STATE
-
-Requests the current filter state from an embedded card.
-
-```javascript
-{
-  type: 'REQUEST_FILTER_STATE',
-  data: {
-    requestId: 1642694400000
-  }
-}
-```
-
-### Inbound Messages (Card → Host)
-
-#### FILTER_STATE_RESPONSE
-
-Response to filter state requests.
-
-```javascript
-{
-  type: 'FILTER_STATE_RESPONSE',
-  data: {
-    requestId: 1642694400000,
-    appliedFilters: [...],
-    availableColumns: ['Region', 'Date', 'Revenue']
-  }
-}
-```
-
-#### FILTER_INTERACTION
-
-Sent when user interacts with filters within the card.
-
-```javascript
-{
-  type: 'FILTER_INTERACTION',
-  data: {
-    action: 'filter_applied',
-    filter: {
-      column: 'Category',
-      operator: 'EQUALS',
-      values: ['Electronics']
-    }
-  }
-}
-```
-
-## Development vs Production
-
-### Development Mode
-
-When running in development (without Domo platform):
-
-- Page filters functionality is simulated
-- Mock data and interactions are provided
-- Status indicator shows "Development Mode"
-
-### Production Mode
-
-When deployed to Domo platform:
-
-- Full integration with Domo's page filter system
-- Real-time synchronization with platform filters
-- Status indicator shows "Domo Connected"
-
-## Usage Examples
-
-### Basic Filter Application
+### Example Usage
 
 ```typescript
-// Apply a simple filter
-const regionFilter: PageFilter = {
-  column: 'Region',
-  operator: 'EQUALS',
-  values: ['North America'],
-};
-
-await window.domo.setFilters([regionFilter]);
-```
-
-### Multiple Filter Management
-
-```typescript
-// Apply multiple filters
-const filters: PageFilter[] = [
-  {
-    column: 'Region',
-    operator: 'EQUALS',
-    values: ['North America', 'Europe'],
+const [notifyFilterChanges] = usePageFilters(
+  (source, filters) => {
+    console.log('Filters updated from:', source, filters);
   },
-  {
-    column: 'Revenue',
-    operator: 'GREATER_THAN',
-    values: ['100000'],
+  (message) => {
+    console.log('Message logged:', message);
   },
-];
+);
 
-await window.domo.setFilters(filters);
+// Notify filter changes
+notifyFilterChanges([
+  { column: 'Region', operator: 'EQUALS', values: ['North America'] },
+]);
 ```
 
-### Filter Change Handling
+### Key Features
 
-```typescript
-// Listen for and handle filter changes
-window.domo.onFiltersUpdate((filters) => {
-  // Update embedded cards
-  const message = {
-    type: 'PAGE_FILTERS_UPDATED',
-    data: { filters },
-  };
+- **Real-time Synchronization**: Ensures filters are synchronized across the app and embedded cards.
+- **Message Handling**: Processes inbound and outbound messages for filter updates, drill events, and frame size changes.
+- **Echo Prevention**: Avoids redundant updates by comparing current and incoming filter states.
 
-  document.querySelectorAll('iframe[data-domo-card]').forEach((iframe) => {
-    iframe.contentWindow.postMessage(message, '*');
-  });
-});
-```
+### Message Types
 
-## Testing Page Filters
+- **`/v1/filters/apply`**: Sends updated filters to embedded cards.
+- **`/v1/onAppReady`**: Registers a new communication channel when an App Studio embed is ready.
+- **`/v1/onFiltersChange`**: Handles filter changes triggered by user interactions.
+- **`/v1/onFrameSizeChange`**: Logs frame size changes.
+- **`/v1/onDrill`**: Processes drill events and updates filters accordingly.
 
-### Mock Data for Development
+### Advanced Features
 
-```typescript
-const mockFilters: PageFilter[] = [
-  {
-    column: 'Date',
-    operator: 'GREATER_THAN_EQUAL',
-    values: ['2024-01-01'],
-  },
-  {
-    column: 'Region',
-    operator: 'EQUALS',
-    values: ['North America'],
-  },
-];
-
-// Simulate filter update
-setTimeout(() => {
-  handlePageFiltersChange(mockFilters);
-}, 2000);
-```
-
-### Integration Testing
-
-```typescript
-// Test filter synchronization
-describe('Page Filters Integration', () => {
-  test('should sync filters to embedded cards', () => {
-    const filters = [{ column: 'Region', operator: 'EQUALS', values: ['US'] }];
-
-    component.handlePageFiltersChange(filters);
-
-    expect(mockIframe.contentWindow.postMessage).toHaveBeenCalledWith(
-      {
-        type: 'PAGE_FILTERS_UPDATED',
-        data: { filters },
-      },
-      '*',
-    );
-  });
-});
-```
+- **Channel Management**: Dynamically registers and manages communication channels for embedded cards.
+- **Filter Validation**: Validates and sanitizes incoming filter data to ensure consistency.
+- **Custom Operators**: Supports custom filter operators for advanced use cases.
 
 ## Best Practices
 
 ### Performance
 
-- **Debounce filter updates**: Prevent excessive messaging during rapid filter changes
-- **Batch filter operations**: Apply multiple filters in a single operation
-- **Cache filter states**: Store current filter state to avoid unnecessary updates
-
-### Error Handling
-
-- **Graceful degradation**: Provide fallback behavior when Domo API is unavailable
-- **Validation**: Validate filter data before applying
-- **User feedback**: Show status and error messages to users
+- **Debounce Updates**: Use debouncing to minimize redundant updates during rapid filter changes.
+- **Batch Operations**: Apply multiple filters in a single operation to reduce overhead.
 
 ### Security
 
-- **Origin validation**: Verify message origins from embedded cards
-- **Data sanitization**: Clean and validate filter values
-- **Permission checking**: Ensure user has permission to modify filters
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Filters not applying**: Check Domo API availability and permissions
-2. **Messages not received**: Verify iframe origins and postMessage syntax
-3. **Performance issues**: Implement debouncing and batch operations
-4. **State synchronization**: Ensure proper cleanup of event listeners
-
-### Debugging Tools
-
-```typescript
-// Enable debug logging
-window.domoDebug = true;
-
-// Log all filter operations
-window.domo.onFiltersUpdate((filters) => {
-  console.log('Page filters updated:', filters);
-  // Your filter handling code
-});
-```
-
-## Advanced Features
-
-### Custom Filter Operators
-
-```typescript
-const customOperators = {
-  CUSTOM_RANGE: (values) => ({
-    min: values[0],
-    max: values[1],
-  }),
-  CONTAINS_ANY: (values) => ({
-    searchTerms: values,
-  }),
-};
-```
-
-### Filter Persistence
-
-```typescript
-// Save filters to local storage
-const saveFilters = (filters: PageFilter[]) => {
-  localStorage.setItem('savedFilters', JSON.stringify(filters));
-};
-
-// Restore filters on load
-const restoreFilters = (): PageFilter[] => {
-  const saved = localStorage.getItem('savedFilters');
-  return saved ? JSON.parse(saved) : [];
-};
-```
-
-### Filter Analytics
-
-```typescript
-// Track filter usage
-const trackFilterUsage = (filter: PageFilter) => {
-  // Send analytics event
-  analytics.track('filter_applied', {
-    column: filter.column,
-    operator: filter.operator,
-    valueCount: filter.values.length,
-  });
-};
-```
+- **Origin Validation**: Verify the origin of incoming messages to prevent unauthorized access.
+- **Data Sanitization**: Clean and validate filter data before applying it.

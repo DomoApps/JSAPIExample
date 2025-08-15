@@ -8,11 +8,11 @@ All messages follow a consistent structure:
 
 ```typescript
 interface DomoMessage {
-  type: string;           // Message type identifier
-  data?: any;            // Optional payload data
-  timestamp?: number;    // Optional timestamp
-  cardId?: string;       // Optional card identifier
-  source?: string;       // Optional source identifier
+  type: string; // Message type identifier
+  data?: any; // Optional payload data
+  timestamp?: number; // Optional timestamp
+  cardId?: string; // Optional card identifier
+  source?: string; // Optional source identifier
 }
 ```
 
@@ -21,6 +21,7 @@ interface DomoMessage {
 ### Outbound Messages (Host → Card)
 
 #### CARD_INIT
+
 Sent when a card is first loaded to initialize communication.
 
 ```javascript
@@ -38,25 +39,44 @@ Sent when a card is first loaded to initialize communication.
 ```
 
 #### FILTER_CHANGE
+
 Apply filters to the embedded card data.
 
 ```javascript
 {
   type: 'FILTER_CHANGE',
   data: {
-    filters: {
-      region: 'North America',
-      dateRange: {
-        start: '2024-01-01',
-        end: '2024-12-31'
+    filters: [
+      {
+        column: 'Region',
+        operator: 'EQUALS',
+        values: ['North America']
       },
-      category: ['Electronics', 'Clothing']
-    }
+      {
+        column: 'Date',
+        operator: 'BETWEEN',
+        values: ['2024-01-01', '2024-12-31']
+      }
+    ]
+  }
+}
+```
+
+#### SYNC_PAGE_FILTERS
+
+Synchronizes current page filter state with embedded cards.
+
+```javascript
+{
+  type: 'SYNC_PAGE_FILTERS',
+  data: {
+    filters: [...currentPageFilters]
   }
 }
 ```
 
 #### REFRESH_DATA
+
 Trigger a data refresh in the embedded card.
 
 ```javascript
@@ -69,37 +89,8 @@ Trigger a data refresh in the embedded card.
 }
 ```
 
-#### EXPORT_DATA
-Request data export from the card.
-
-```javascript
-{
-  type: 'EXPORT_DATA',
-  data: {
-    format: 'csv',      // csv, xlsx, json, pdf
-    includeFilters: true,
-    filename: 'sales_report_2024'
-  }
-}
-```
-
-#### THEME_CHANGE
-Update the visual theme of the embedded card.
-
-```javascript
-{
-  type: 'THEME_CHANGE',
-  data: {
-    theme: 'dark',
-    colors: {
-      primary: '#007bff',
-      secondary: '#6c757d'
-    }
-  }
-}
-```
-
 #### CUSTOM_EVENT
+
 Send custom application-specific events.
 
 ```javascript
@@ -119,6 +110,7 @@ Send custom application-specific events.
 ### Inbound Messages (Card → Host)
 
 #### CARD_LOADED
+
 Sent when the card has finished loading and is ready for interaction.
 
 ```javascript
@@ -132,65 +124,41 @@ Sent when the card has finished loading and is ready for interaction.
 }
 ```
 
-#### USER_INTERACTION
-Sent when the user interacts with elements in the card.
+#### FILTER_STATE_RESPONSE
+
+Response to filter state requests.
 
 ```javascript
 {
-  type: 'USER_INTERACTION',
+  type: 'FILTER_STATE_RESPONSE',
   data: {
-    action: 'click',
-    element: 'data_point',
-    coordinates: { x: 150, y: 200 },
-    value: {
-      category: 'Electronics',
-      revenue: 50000,
-      region: 'North America'
-    }
+    requestId: 1642694400000,
+    appliedFilters: [...],
+    availableColumns: ['Region', 'Date', 'Revenue']
   }
 }
 ```
 
-#### DATA_UPDATED
-Sent when the card's data has been updated.
+#### FILTER_INTERACTION
+
+Sent when user interacts with filters within the card.
 
 ```javascript
 {
-  type: 'DATA_UPDATED',
+  type: 'FILTER_INTERACTION',
   data: {
-    timestamp: 1642694400000,
-    recordCount: 1250,
-    lastRefresh: '2024-01-20T10:30:00Z',
-    changes: {
-      added: 50,
-      modified: 25,
-      removed: 5
+    action: 'filter_applied',
+    filter: {
+      column: 'Category',
+      operator: 'EQUALS',
+      values: ['Electronics']
     }
-  }
-}
-```
-
-#### FILTER_APPLIED
-Confirmation that filters have been successfully applied.
-
-```javascript
-{
-  type: 'FILTER_APPLIED',
-  data: {
-    appliedFilters: {
-      region: 'North America',
-      dateRange: {
-        start: '2024-01-01',
-        end: '2024-12-31'
-      }
-    },
-    resultCount: 850,
-    success: true
   }
 }
 ```
 
 #### DRILL_DOWN
+
 Sent when user performs a drill-down action.
 
 ```javascript
@@ -208,6 +176,7 @@ Sent when user performs a drill-down action.
 ```
 
 #### ERROR
+
 Sent when an error occurs in the embedded card.
 
 ```javascript
@@ -257,7 +226,7 @@ class MessageQueue {
 
   async handleMessage(message) {
     // Process message with delay to prevent overwhelming the card
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(() => {
         this.sendToCard(message);
         resolve();
@@ -267,100 +236,20 @@ class MessageQueue {
 }
 ```
 
-### Request-Response Pattern
+### Security Considerations
 
-For messages that expect a response:
-
-```javascript
-class MessageBridge {
-  constructor() {
-    this.pendingRequests = new Map();
-    this.requestId = 0;
-  }
-
-  async sendRequest(type, data, timeout = 5000) {
-    const id = ++this.requestId;
-    
-    return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
-        this.pendingRequests.delete(id);
-        reject(new Error('Request timeout'));
-      }, timeout);
-
-      this.pendingRequests.set(id, { resolve, reject, timer });
-
-      this.sendMessage({
-        type,
-        data,
-        requestId: id
-      });
-    });
-  }
-
-  handleResponse(message) {
-    if (message.requestId && this.pendingRequests.has(message.requestId)) {
-      const { resolve, timer } = this.pendingRequests.get(message.requestId);
-      clearTimeout(timer);
-      this.pendingRequests.delete(message.requestId);
-      resolve(message);
-    }
-  }
-}
-```
-
-### Event Batching Pattern
-
-For batching multiple filter changes:
-
-```javascript
-class FilterBatcher {
-  constructor(sendCallback, delay = 300) {
-    this.sendCallback = sendCallback;
-    this.delay = delay;
-    this.pendingFilters = {};
-    this.timeoutId = null;
-  }
-
-  addFilter(key, value) {
-    this.pendingFilters[key] = value;
-    this.scheduleUpdate();
-  }
-
-  removeFilter(key) {
-    delete this.pendingFilters[key];
-    this.scheduleUpdate();
-  }
-
-  scheduleUpdate() {
-    if (this.timeoutId) {
-      clearTimeout(this.timeoutId);
-    }
-
-    this.timeoutId = setTimeout(() => {
-      this.sendCallback({
-        type: 'FILTER_CHANGE',
-        data: { filters: { ...this.pendingFilters } }
-      });
-      this.timeoutId = null;
-    }, this.delay);
-  }
-}
-```
-
-## Security Considerations
-
-### Origin Validation
+#### Origin Validation
 
 Always validate the origin of incoming messages:
 
 ```javascript
 const TRUSTED_ORIGINS = [
   'https://your-instance.domo.com',
-  'https://dev-instance.domo.com'
+  'https://dev-instance.domo.com',
 ];
 
 function isValidOrigin(origin) {
-  return TRUSTED_ORIGINS.some(trusted => origin === trusted);
+  return TRUSTED_ORIGINS.some((trusted) => origin === trusted);
 }
 
 window.addEventListener('message', (event) => {
@@ -368,12 +257,12 @@ window.addEventListener('message', (event) => {
     console.warn('Rejected message from untrusted origin:', event.origin);
     return;
   }
-  
+
   handleMessage(event.data);
 });
 ```
 
-### Message Sanitization
+#### Message Sanitization
 
 Sanitize incoming message data:
 
@@ -385,7 +274,7 @@ function sanitizeMessage(message) {
 
   const sanitized = {
     type: String(message.type || '').slice(0, 50),
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
 
   if (message.data) {
@@ -399,202 +288,22 @@ function sanitizeData(data) {
   if (Array.isArray(data)) {
     return data.slice(0, 100).map(sanitizeData);
   }
-  
+
   if (typeof data === 'object' && data !== null) {
     const sanitized = {};
-    Object.keys(data).slice(0, 20).forEach(key => {
-      const cleanKey = String(key).slice(0, 50);
-      sanitized[cleanKey] = sanitizeData(data[key]);
-    });
+    Object.keys(data)
+      .slice(0, 20)
+      .forEach((key) => {
+        const cleanKey = String(key).slice(0, 50);
+        sanitized[cleanKey] = sanitizeData(data[key]);
+      });
     return sanitized;
   }
-  
+
   if (typeof data === 'string') {
     return data.slice(0, 1000);
   }
-  
+
   return data;
-}
-```
-
-### Rate Limiting
-
-Implement rate limiting for incoming messages:
-
-```javascript
-class RateLimiter {
-  constructor(maxMessages = 100, windowMs = 60000) {
-    this.maxMessages = maxMessages;
-    this.windowMs = windowMs;
-    this.messages = [];
-  }
-
-  isAllowed() {
-    const now = Date.now();
-    this.messages = this.messages.filter(time => now - time < this.windowMs);
-    
-    if (this.messages.length >= this.maxMessages) {
-      return false;
-    }
-    
-    this.messages.push(now);
-    return true;
-  }
-}
-
-const rateLimiter = new RateLimiter();
-
-window.addEventListener('message', (event) => {
-  if (!rateLimiter.isAllowed()) {
-    console.warn('Rate limit exceeded, ignoring message');
-    return;
-  }
-  
-  handleMessage(event.data);
-});
-```
-
-## Testing Strategies
-
-### Message Mocking
-
-Create mock messages for testing:
-
-```javascript
-class MessageMocker {
-  constructor() {
-    this.mockMessages = {
-      cardLoaded: {
-        type: 'CARD_LOADED',
-        data: { cardId: 'test-card', version: '1.0.0' }
-      },
-      userClick: {
-        type: 'USER_INTERACTION',
-        data: { action: 'click', value: { revenue: 1000 } }
-      },
-      error: {
-        type: 'ERROR',
-        data: { code: 'TEST_ERROR', message: 'Test error message' }
-      }
-    };
-  }
-
-  sendMockMessage(messageType, delay = 0) {
-    setTimeout(() => {
-      const event = new MessageEvent('message', {
-        data: this.mockMessages[messageType],
-        origin: 'https://test-instance.domo.com'
-      });
-      window.dispatchEvent(event);
-    }, delay);
-  }
-
-  simulateUserFlow() {
-    this.sendMockMessage('cardLoaded', 100);
-    this.sendMockMessage('userClick', 2000);
-  }
-}
-```
-
-### Integration Testing
-
-Test message flows:
-
-```javascript
-describe('Domo Card Communication', () => {
-  let mockWindow;
-  let messageHandler;
-
-  beforeEach(() => {
-    mockWindow = {
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
-      postMessage: jest.fn()
-    };
-    
-    messageHandler = new DomoCardMessageHandler(mockWindow);
-  });
-
-  test('should handle card loaded message', () => {
-    const message = {
-      type: 'CARD_LOADED',
-      data: { cardId: 'test-card' }
-    };
-
-    messageHandler.handleMessage(message);
-    
-    expect(messageHandler.isCardReady('test-card')).toBe(true);
-  });
-
-  test('should send filter change message', () => {
-    const filters = { region: 'North America' };
-    
-    messageHandler.sendFilterChange('test-card', filters);
-    
-    expect(mockWindow.postMessage).toHaveBeenCalledWith({
-      type: 'FILTER_CHANGE',
-      data: { filters }
-    }, '*');
-  });
-});
-```
-
-## Performance Optimization
-
-### Message Debouncing
-
-Prevent excessive message sending:
-
-```javascript
-function debounce(func, delay) {
-  let timeoutId;
-  return function (...args) {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func.apply(this, args), delay);
-  };
-}
-
-const debouncedFilterChange = debounce((filters) => {
-  sendToCard('FILTER_CHANGE', { filters });
-}, 300);
-```
-
-### Memory Management
-
-Clean up event listeners and references:
-
-```javascript
-class DomoCardManager {
-  constructor() {
-    this.cards = new Map();
-    this.messageListener = this.handleMessage.bind(this);
-    window.addEventListener('message', this.messageListener);
-  }
-
-  addCard(cardId, iframe) {
-    this.cards.set(cardId, {
-      iframe,
-      lastActivity: Date.now()
-    });
-  }
-
-  removeCard(cardId) {
-    this.cards.delete(cardId);
-  }
-
-  cleanup() {
-    window.removeEventListener('message', this.messageListener);
-    this.cards.clear();
-  }
-
-  // Clean up inactive cards
-  cleanupInactiveCards(maxAge = 300000) { // 5 minutes
-    const now = Date.now();
-    for (const [cardId, card] of this.cards) {
-      if (now - card.lastActivity > maxAge) {
-        this.removeCard(cardId);
-      }
-    }
-  }
 }
 ```
