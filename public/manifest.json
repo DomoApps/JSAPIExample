@@ -1,5 +1,5 @@
 {
-  "name": "Advanced React DomoApp",
+  "name": "JS API Example",
   "version": "0.0.1",
   "size": {
     "width": 3,
@@ -7,10 +7,10 @@
   },
   "mapping": [
     {
-      "dataSetId": "ca625e70-882b-42cc-8157-3aa63505e074",
+      "dataSetId": "",
       "alias": "living_legend",
       "fields": []
     }
   ],
-  "id": "33f75d07-c380-4417-aa34-c7d9ba3e3424"
+  "id": ""
 }

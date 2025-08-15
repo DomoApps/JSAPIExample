@@ -50,21 +50,10 @@ const App = () => {
         <section className={styles.cardSection}>
           <h2>Embedded Domo Card</h2>
           <DropdownSelector />
+          {/* TODO: Here we embed our cards so make sure you update the card urls here to the ones for your instance*/}
           <EmbeddedCard
-            iframeUrl="https://domo-es.domo.com/embed/card/private/79mz8"
+            iframeUrl="https://<instance>.domo.com/embed/card/private/<embedId>"
             title="Hero Slicer"
-            width={1000}
-            height={400}
-          />
-          <EmbeddedCard
-            iframeUrl="https://domo-es.domo.com/embed/card/private/jYjMY"
-            title="Class Slicer"
-            width={1000}
-            height={400}
-          />
-          <EmbeddedCard
-            iframeUrl="https://domo-es.domo.com/embed/card/private/81P2W"
-            title="Weekly Points"
             width={1000}
             height={400}
           />

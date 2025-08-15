@@ -21,6 +21,8 @@ export const PageFiltersManager: React.FC<Props> = (props: Props) => {
   );
 
   const handleApplyFilter = () => {
+    // TODO: Please update this to match filters you want to apply
+    // This is just an example filter based on the selected class
     const newFilter: PageFilter = {
       column: 'Talent_Class',
       columnType: ColumnType.STRING,
@@ -41,6 +43,8 @@ export const PageFiltersManager: React.FC<Props> = (props: Props) => {
     if (selectedClass === null) {
       return;
     }
+    // TODO: Please update this to match filters you want to apply
+    // This is just an example filter based on the selected class
     const newFilter: PageFilter = {
       column: 'Talent_Class',
       columnType: ColumnType.STRING,

@@ -5,6 +5,7 @@ This project demonstrates how to create a custom application that embeds Domo ca
 ## 🎯 Purpose
 
 This instructional example teaches developers how to:
+
 - Embed Domo cards in custom applications
 - Implement bidirectional communication using postMessage API
 - Handle different types of messages and events
@@ -13,30 +14,63 @@ This instructional example teaches developers how to:
 ## 🚀 Features
 
 ### 1. **Embedded Card Component**
+
 - Configurable card embedding with custom dimensions
 - Automatic iframe setup with security considerations
 - Real-time card configuration updates
 
 ### 2. **PostMessage Communication**
+
 - Send messages to embedded cards (filters, refresh commands, custom events)
 - Receive messages from embedded cards (user interactions, data updates)
 - Real-time message logging and debugging
 
 ### 3. **Interactive Controls**
+
 - Apply filters to embedded cards
 - Trigger data refreshes
 - Export data functionality
 - Send custom events and commands
 
 ### 4. **Message Logger**
+
 - Real-time logging of all postMessage communications
 - Message type categorization (sent/received/system)
 - Timestamped message history
 - JSON data formatting and display
 
+### Addressing TODO Comments
+
+This project includes several `// TODO:` comments to guide further development. Below are the instructions for addressing them:
+
+1. **Page Filters Manager** (`src/components/page-filters-manager/index.tsx`):
+   - **Line 24 & 46**: Update the example filter logic to match the filters you want to apply in your application. Replace the placeholder filter (`Talent_Class`) with the actual column, data type, and values relevant to your use case.
+     ```typescript
+     const newFilter: PageFilter = {
+       column: 'Your_Column_Name',
+       columnType: ColumnType.STRING, // Adjust based on your data type
+       dataType: PageFilterDataType.String, // Adjust based on your data type
+       label: 'Your Label',
+       operand: PageFilterOperator.In, // Adjust based on your filter operation
+       values: ['Value1', 'Value2'], // Replace with actual filter values
+     };
+     ```
+
+2. **App Component** (`src/components/app/index.tsx`):
+   - **Line 53**: Update the `iframeUrl` property of the `EmbeddedCard` component to use the correct Domo instance and card embed IDs for your application.
+     ```tsx
+     <EmbeddedCard
+       iframeUrl="https://your-instance.domo.com/embed/card/private/your-embed-id"
+       title="Your Card Title"
+       width={1000}
+       height={400}
+     />
+     ```
+
 ## 🛠 Setup Instructions
 
 ### Prerequisites
+
 - Node.js (v14 or higher)
 - Yarn package manager
 - Domo Developer Account
@@ -45,6 +79,7 @@ This instructional example teaches developers how to:
 ### Installation
 
 1. **Clone and install dependencies:**
+
    ```bash
    git clone <repository-url>
    cd embed-frames-example
@@ -52,6 +87,7 @@ This instructional example teaches developers how to:
    ```
 
 2. **Configure Domo CLI:**
+
    ```bash
    domo login
    ```
@@ -62,11 +98,13 @@ This instructional example teaches developers how to:
    - Update the `domoInstance` prop in the EmbeddedCard component
 
 4. **Run the development server:**
+
    ```bash
    yarn start
    ```
 
 5. **Upload to Domo (optional):**
+
    ```bash
    yarn upload
    ```
@@ -83,31 +121,42 @@ This instructional example teaches developers how to:
 ### PostMessage API Examples
 
 #### Sending Messages to Cards
+
 ```javascript
 // Filter application
-iframe.contentWindow.postMessage({
-  type: 'FILTER_CHANGE',
-  data: { filters: { region: 'North America' } }
-}, '*');
+iframe.contentWindow.postMessage(
+  {
+    type: 'FILTER_CHANGE',
+    data: { filters: { region: 'North America' } },
+  },
+  '*',
+);
 
 // Data refresh
-iframe.contentWindow.postMessage({
-  type: 'REFRESH_DATA'
-}, '*');
+iframe.contentWindow.postMessage(
+  {
+    type: 'REFRESH_DATA',
+  },
+  '*',
+);
 
 // Custom events
-iframe.contentWindow.postMessage({
-  type: 'CUSTOM_EVENT',
-  data: { action: 'highlight', value: 'top-performers' }
-}, '*');
+iframe.contentWindow.postMessage(
+  {
+    type: 'CUSTOM_EVENT',
+    data: { action: 'highlight', value: 'top-performers' },
+  },
+  '*',
+);
 ```
 
 #### Receiving Messages from Cards
+
 ```javascript
 window.addEventListener('message', (event) => {
   // Validate origin for security
   if (event.origin !== 'https://your-domo-instance.domo.com') return;
-  
+
   switch (event.data.type) {
     case 'CARD_CLICKED':
       console.log('User clicked on card:', event.data);
@@ -122,62 +171,32 @@ window.addEventListener('message', (event) => {
 });
 ```
 
-## 🏗 Architecture
-
-### Component Structure
-```
-src/
-├── components/
-│   ├── app/                    # Main application component
-│   ├── embedded-card/          # Card embedding component
-│   ├── message-logger/         # PostMessage logging component
-│   └── counter/               # Example counter (can be removed)
-├── reducers/                  # Redux state management
-└── styles/                    # Global styles
-```
-
-### Key Components
-
-#### `EmbeddedCard`
-- Manages iframe lifecycle
-- Handles card initialization
-- Provides security sandbox settings
-- Sends initial configuration messages
-
-#### `MessageLogger`
-- Logs all postMessage communications
-- Provides real-time debugging capabilities
-- Formats and displays message data
-- Maintains message history
-
-#### `App`
-- Main application orchestrator
-- Manages global message listeners
-- Provides UI for card configuration
-- Demonstrates various communication patterns
-
 ## 🔒 Security Considerations
 
 ### Origin Validation
+
 ```javascript
 // Always validate message origins in production
 if (event.origin !== 'https://your-domo-instance.domo.com') return;
 ```
 
 ### Iframe Sandbox
+
 ```html
 <iframe
   sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
-  src={embedUrl}
+  src="{embedUrl}"
 />
 ```
 
 ### Content Security Policy
+
 Configure CSP headers to allow embedding from trusted Domo domains.
 
 ## 📋 Message Types Reference
 
 ### Standard Messages (sent to cards)
+
 - `FILTER_CHANGE`: Apply filters to card data
 - `REFRESH_DATA`: Trigger data refresh
 - `EXPORT_DATA`: Request data export
@@ -185,6 +204,7 @@ Configure CSP headers to allow embedding from trusted Domo domains.
 - `CUSTOM_EVENT`: Custom application events
 
 ### Standard Messages (received from cards)
+
 - `CARD_LOADED`: Card finished loading
 - `CARD_CLICKED`: User interaction with card
 - `DATA_UPDATED`: Data source updated
@@ -194,12 +214,14 @@ Configure CSP headers to allow embedding from trusted Domo domains.
 ## 🔧 Customization
 
 ### Adding New Message Types
+
 1. Update the message type constants
 2. Add handlers in the main App component
 3. Update the embedded card component if needed
 4. Add corresponding UI controls
 
 ### Styling Customization
+
 - Modify SCSS files in each component directory
 - Update global styles in `src/styles/`
 - Customize color scheme in `src/styles/variables.scss`
@@ -239,7 +261,6 @@ Configure CSP headers to allow embedding from trusted Domo domains.
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-- [User Guide](https://create-react-app.dev) – How to develop apps bootstrapped with Create React App.
 
 ## Available Scripts
 
@@ -252,6 +273,7 @@ Allows you to generate components or reducers.<br />
 **Components**<br />
 
 The command `yarn generate component` will generate a new component and add it to the components folder of your project. There are 3 parameters to the `component` generator that you will be prompted for if you do not provide them inline:
+
 <ol>
   <li> Component Name </li>
   <li> Whether or not you would like to include a test file (y/n) </li>
