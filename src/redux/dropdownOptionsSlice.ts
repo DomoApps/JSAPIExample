@@ -2,17 +2,17 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { datasetService } from 'services/dataset';
 
 interface DropdownOptionsState {
-  options: string[];
+  options: Record<string, string[]>;
   loading: boolean;
   error: string | null;
-  currentSelected: string | null; // Added currentSelected property
+  currentSelected: Record<string, string | null>; // Added currentSelected property
 }
 
 const initialState: DropdownOptionsState = {
-  options: [],
+  options: {},
   loading: false,
   error: null,
-  currentSelected: null, // Initialize currentSelected
+  currentSelected: {}, // Initialize currentSelected
 };
 
 export const fetchDropdownOptions = createAsyncThunk(
@@ -35,7 +35,10 @@ const dropdownOptionsSlice = createSlice({
       state.loading = true;
       state.error = null;
     },
-    fetchOptionsSuccess(state, action: PayloadAction<string[]>) {
+    fetchOptionsSuccess(
+      state,
+      action: PayloadAction<Record<string, string[]>>,
+    ) {
       state.loading = false;
       state.options = action.payload;
     },
@@ -43,8 +46,12 @@ const dropdownOptionsSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    setCurrentSelected(state, action: PayloadAction<string>) {
-      state.currentSelected = action.payload; // Update currentSelected
+    setCurrentSelected(
+      state,
+      action: PayloadAction<{ columnKey: string; value: string | null }>,
+    ) {
+      const { columnKey, value } = action.payload;
+      state.currentSelected[columnKey] = value;
     },
   },
   extraReducers: (builder) => {

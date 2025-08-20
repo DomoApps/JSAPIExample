@@ -71,10 +71,11 @@ This project includes several `// TODO:` comments to guide further development. 
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
+- Node.js (v18 or higher)
 - Yarn package manager
 - Domo Developer Account
 - Access to Domo instance with embedding enabled
+- Ryuu ([DomoApps CLI](https://developer.domo.com/portal/rmfbkwje8kmqj-domo-apps-cli)) installed
 
 ### Installation
 
@@ -86,24 +87,29 @@ This project includes several `// TODO:` comments to guide further development. 
    yarn install
    ```
 
-2. **Configure Domo CLI:**
+1. **Import The Sample Data:**
+   - CSV is located in the docs folder
+   - Upload as a new dataset in your instance
+   - Make a note of the dataset ID for later use
+
+1. **Login to your instance with Ryuu:**
 
    ```bash
    domo login
    ```
 
-3. **Update configuration:**
+1. **Update configuration:**
    - Edit `src/components/embedded-card/index.tsx`
    - Replace `your-domo-instance` with your actual Domo instance name
    - Update the `domoInstance` prop in the EmbeddedCard component
 
-4. **Run the development server:**
+1. **Run the development server:**
 
    ```bash
    yarn start
    ```
 
-5. **Upload to Domo (optional):**
+1. **Upload to Domo (optional):**
 
    ```bash
    yarn upload

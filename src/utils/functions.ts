@@ -1,5 +1,12 @@
 import { APP_STUDIO_TAG } from 'constants/index';
-import { AppStudioPageFilter, PageFilter } from 'models';
+import {
+  AppStudioPageFilter,
+  ClientsDataset,
+  ColumnType,
+  PageFilter,
+  PageFilterDataType,
+  PageFilterOperator,
+} from 'models';
 
 export const hasAppStudioTag = (value: string) =>
   value.toUpperCase().endsWith(`${APP_STUDIO_TAG}`);
@@ -36,3 +43,19 @@ export const filtersAreEquals = (
 
   return areEqual; // if there is a difference in the filters
 };
+
+export const createFilter = (
+  column: string,
+  label: string,
+  value: string | string[],
+  columnType: ColumnType = ColumnType.STRING,
+  dataType: PageFilterDataType = PageFilterDataType.String,
+  operand: PageFilterOperator = PageFilterOperator.In,
+): PageFilter => ({
+  column: ClientsDataset[column],
+  columnType,
+  dataType,
+  label,
+  operand,
+  values: Array.isArray(value) ? value : [value],
+});

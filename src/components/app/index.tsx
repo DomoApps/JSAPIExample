@@ -1,15 +1,16 @@
-import { Provider, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { EmbeddedCard } from 'components/embedded-card';
 import { MessageLogger } from 'components/message-logger';
 import { PageFiltersManager } from 'components/page-filters-manager';
 import { DropdownSelector } from 'components/dropdown-selector';
-import store, { RootState } from 'redux/store';
+import { RootState } from 'redux/store';
 import { usePageFilters } from 'hooks/use-page-filters';
 import { setFilters } from 'redux/pageFiltersSlice';
 import { addMessage } from 'redux/messagesSlice';
-import styles from './index.module.scss';
 import { useEffect } from 'react';
 import { fetchDropdownOptions } from 'redux/dropdownOptionsSlice';
+import { cardUrls } from 'configuration';
+import styles from './index.module.scss';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -45,18 +46,19 @@ const App = () => {
       </header>
 
       <main className={styles.App__main}>
-        <PageFiltersManager notifyChanges={notifyFilterChanges} />
+        <PageFiltersManager />
 
         <section className={styles.cardSection}>
           <h2>Embedded Domo Card</h2>
-          <DropdownSelector />
-          {/* TODO: Here we embed our cards so make sure you update the card urls here to the ones for your instance*/}
-          <EmbeddedCard
-            iframeUrl="https://<instance>.domo.com/embed/card/private/<embedId>"
-            title="Hero Slicer"
-            width={1000}
-            height={400}
-          />
+          {cardUrls.map((url, index) => (
+            <EmbeddedCard
+              key={index}
+              iframeUrl={url}
+              title={`Embedded Card ${index + 1}`}
+              width={1000}
+              height={400}
+            />
+          ))}
         </section>
 
         <MessageLogger />
