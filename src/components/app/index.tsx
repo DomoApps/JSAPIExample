@@ -2,22 +2,21 @@ import { useDispatch, useSelector } from 'react-redux';
 import { EmbeddedCard } from 'components/embedded-card';
 import { MessageLogger } from 'components/message-logger';
 import { PageFiltersManager } from 'components/page-filters-manager';
-import { DropdownSelector } from 'components/dropdown-selector';
 import { RootState } from 'redux/store';
 import { usePageFilters } from 'hooks/use-page-filters';
 import { setFilters } from 'redux/pageFiltersSlice';
 import { addMessage } from 'redux/messagesSlice';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchDropdownOptions } from 'redux/dropdownOptionsSlice';
 import { cardUrls } from 'configuration';
 import styles from './index.module.scss';
 
 const App = () => {
   const dispatch = useDispatch();
+  const [isAuthenticated, setIsAuthenticated] = useState(true); // No auth needed
 
   useEffect(() => {
-    // Initialize any necessary state or subscriptions here
-    // For example, you might want to fetch initial filters or messages
+    // No authentication required, just load dropdown options
     dispatch(fetchDropdownOptions());
   }, []);
   const pageFilters = useSelector(

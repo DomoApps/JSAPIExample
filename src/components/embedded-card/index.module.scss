@@ -44,10 +44,6 @@
   transition: opacity 0.3s ease;
 }
 
-.cardFrame:not([src]) {
-  opacity: 0.5;
-}
-
 .cardFooter {
   background: #f8f9fa;
   padding: 0.5rem 1rem;
@@ -73,7 +69,7 @@
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .cardTitle {
     font-size: 1rem;
   }
