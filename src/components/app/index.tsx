@@ -13,7 +13,6 @@ import styles from './index.module.scss';
 
 const App = () => {
   const dispatch = useDispatch();
-  const [isAuthenticated, setIsAuthenticated] = useState(true); // No auth needed
 
   useEffect(() => {
     // No authentication required, just load dropdown options
